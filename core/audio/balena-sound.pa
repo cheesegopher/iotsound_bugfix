@@ -1,9 +1,10 @@
 # See https://github.com/iotsound/iotsound/blob/master/docs/ARCHITECTURE.md for details
 
 # Create balena-sound sinks
-load-module module-null-sink sink_name=balena-sound.input
-load-module module-null-sink sink_name=balena-sound.output
-load-module module-null-sink sink_name=snapcast
+# Descriptions are set so loopback sink inputs get identifiable names, e.g. "Loopback from Monitor of balena-sound.input"
+load-module module-null-sink sink_name=balena-sound.input sink_properties=device.description=balena-sound.input
+load-module module-null-sink sink_name=balena-sound.output sink_properties=device.description=balena-sound.output
+load-module module-null-sink sink_name=snapcast sink_properties=device.description=snapcast
 
 # Route all plugin input to the default sink
 set-default-sink balena-sound.input

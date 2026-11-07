@@ -19,9 +19,13 @@ export default class SoundAPI {
 
   constructor(public config: SoundConfig, public audioBlock: BalenaAudio) {
     this.sdk = getSdk({ apiUrl: 'https://api.balena-cloud.com/' })
-    this.sdk.auth.logout()
-    this.sdk.auth.loginWithToken(process.env.BALENA_API_KEY!) // Asserted by io.balena.features.balena-api: '1'
-    
+    // BALENA_API_KEY is only present on balenaCloud-managed devices (io.balena.features.balena-api: '1'),
+    // unmanaged devices running without balenaCloud don't have one
+    if (process.env.BALENA_API_KEY) {
+      this.sdk.auth.logout()
+      this.sdk.auth.loginWithToken(process.env.BALENA_API_KEY)
+    }
+
     this.api = express()
     this.api.use(express.json())
 
@@ -62,6 +66,10 @@ export default class SoundAPI {
     this.api.post('/device/shutdown', asyncHandler(async (_req, res) => res.json(await shutdownDevice())))
     this.api.post('/device/dtoverlay', asyncHandler(async (req, res) => {
       const { dtoverlay } = req.body
+      if (!process.env.BALENA_API_KEY) {
+        res.json({ error: 'Not available without balenaCloud. Set dtoverlay in config.txt on the boot partition instead.' })
+        return
+      }
       try {
         console.log(`Applying BALENA_HOST_CONFIG_dtoverlay=${dtoverlay}...`)
         await this.sdk.models.device.configVar.set(process.env.BALENA_DEVICE_UUID!, 'BALENA_HOST_CONFIG_dtoverlay', dtoverlay) // BALENA_DEVICE_UUID is always present in balenaOS

@@ -12,9 +12,13 @@ const soundAPI: SoundAPI = new SoundAPI(config, audioBlock)
 config.bindAudioBlock(audioBlock)
 
 // init balenaCloud sdk
+// Only available on balenaCloud-managed devices, unmanaged devices have no BALENA_API_KEY
 const sdk = getSdk({ apiUrl: 'https://api.balena-cloud.com/' })
-sdk.auth.logout()
-sdk.auth.loginWithToken(process.env.BALENA_API_KEY!) // Asserted by io.balena.features.balena-api: '1'
+const hasBalenaCloud: boolean = !!process.env.BALENA_API_KEY
+if (hasBalenaCloud) {
+  sdk.auth.logout()
+  sdk.auth.loginWithToken(process.env.BALENA_API_KEY!)
+}
 
 // Fleet communication
 let discoveryOptions: any = {
@@ -27,6 +31,19 @@ const fleetSubscriber: cote.Subscriber = new cote.Subscriber({ name: 'balenaSoun
 
 init()
 async function init() {
+  // On boot the network may not be up yet. Without an IP address the device would advertise
+  // 'localhost' as multi-room master, which other containers and devices can't reach
+  for (let i = 0; i < 30 && config.device.ip === 'localhost'; i++) {
+    if (i === 0) {
+      console.log('Waiting for an IP address...')
+    }
+    await timeout(1000)
+    config.refreshIPAddress()
+  }
+  if (config.device.ip === 'localhost') {
+    console.log('No IP address found, using localhost. Multi-room will not work across devices.')
+  }
+
   await soundAPI.listen(constants.port)
   await audioBlock.listen()
   await audioBlock.setVolume(constants.volume)
@@ -40,11 +57,25 @@ async function init() {
 
   // Periodically sync the fleet
   setInterval(() => {
+    if (config.refreshIPAddress()) {
+      console.log(`IP address changed to ${config.device.ip}`)
+    }
     if (config.isMultiRoomEnabled()) {
       fleetPublisher.publish('fleet-sync', { type: 'sync', origin: config.device.ip })
     }
   }, constants.multiroom.pollInterval)
 }
+
+// Event: "mode-change"
+// Source: sound supervisor API
+// When switching into a multi-room mode, ask the fleet who the current master is
+config.onModeChange((mode, oldMode) => {
+  console.log(`Mode changed from ${oldMode} to ${mode}`)
+  if (config.isMultiRoomEnabled()) {
+    console.log('Requesting master info with fleet-sync...')
+    fleetPublisher.publish('fleet-sync', { type: 'sync', origin: config.device.ip })
+  }
+})
 
 // Event: "play"
 // Source: audio block
@@ -62,10 +93,12 @@ audioBlock.on('play', async (sink: any) => {
   }
 
   // Temporary usage tracking for balenaHub metrics
-  try {
-    await sdk.models.device.tags.set(process.env.BALENA_DEVICE_UUID!, 'metrics:play', '') // BALENA_DEVICE_UUID is always present in balenaOS
-  } catch (error) {
-    console.log(error.message)
+  if (hasBalenaCloud) {
+    try {
+      await sdk.models.device.tags.set(process.env.BALENA_DEVICE_UUID!, 'metrics:play', '') // BALENA_DEVICE_UUID is always present in balenaOS
+    } catch (error) {
+      console.log(error.message)
+    }
   }
 
 })

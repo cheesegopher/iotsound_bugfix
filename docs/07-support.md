@@ -17,7 +17,7 @@ Ensure that:
 - You correctly plugged an audio or HDMI cable to your device
 - You are connected to the device and streaming audio to it via any of the supported alternatives
 
-If you are using a DAC, make sure your DAC is on the supported list [here](audio-interfaces#dac-boards) and that you applied the required configuration changes. If your DAC is not on the list, please let us know by opening an [issue](https://github.com/iotsound/iotsound/issues/new). 
+If you are using a DAC, make sure your DAC is on the supported list [here](05-audio-interfaces.md#dac-boards) and that you applied the required configuration changes. If your DAC is not on the list, please let us know by opening an [issue](https://github.com/iotsound/iotsound/issues/new). 
 
 ### Audio cuts or is very stuttery
 
@@ -65,7 +65,7 @@ This is the official recommendation made by the Raspberry Pi Foundation. Adding 
 
 Using multi-room has proven to make this issue a lot more frequent and noticeable; most likely due to the increased resource usage that it requires.
 
-- If you are _not_ using multi-room (you only have one device on your IoTSound fleet) you can disable it to alleviate the problem. Check our [docs](customization/#general) to find out how.
+- If you are _not_ using multi-room (you only have one device on your IoTSound fleet) you can disable it to alleviate the problem. Check our [docs](03-customization.md#general) to find out how.
 - If you are using multi-room consider changing the `master server` from which you stream to other devices to a Raspberry Pi 4. Raspberry Pi 3's can exhibit audio stuttering when working as `master server` but they work fine if you use them as `clients`.
 
 ##### Change Power Supply Unit (PSU)
@@ -98,7 +98,7 @@ IoTSound uses many technologies to provide audio streaming capabilities. All the
 There are however workarounds that you might want to take if you are willing to sacrifice some features:
 
 - Airplay streaming has a built-in two-second delay. Using a different audio source will obviously yield better results.
-- If you are _not_ using the multi-room feature you can disable it; multi-room adds the most of the perceived delay as it needs it to sync audio across devices. Check our [docs](customization/#general) to find out how to disable it.
+- If you are _not_ using the multi-room feature you can disable it; multi-room adds the most of the perceived delay as it needs it to sync audio across devices. Check our [docs](03-customization.md#general) to find out how to disable it.
 
 ### Multiroom is not working
 
@@ -108,7 +108,7 @@ Streaming audio to a device works fine but other devices on the network don't sy
 
 #### Solution
 
-Multi-room is enabled by default in all device types. Ensure your device is properly configured. You can see the list of default modes of operation [here](device-support).
+Multi-room is enabled by default in all device types. Ensure your device is properly configured. You can see the list of default modes of operation [here](06-device-support.md).
 
 If your device is properly configured and still can't get multi-room to work try power cycling the `master server` device. Devices might have missed the event broadcast where a device announces itself as a new `master server`, by rebooting it we force the device to send them again.
 

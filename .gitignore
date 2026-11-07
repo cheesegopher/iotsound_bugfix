@@ -7,3 +7,7 @@ node_modules
 build
 core/multiroom/server/snapweb
 labs-docs-builder
+
+# Local push device list (IPs, per-device settings)
+scripts/local-push/devices.json
+scripts/local-push/logs

@@ -12,9 +12,9 @@ RUN apk update && apk add --no-cache supervisor curl~=7 && \
   curl -skL https://raw.githubusercontent.com/balena-io-experimental/audio/master/scripts/alsa-bridge/alpine-setup.sh | sh \
   && apk del curl
 
-COPY start.sh /usr/src/
+COPY entry.sh start.sh /usr/src/
 COPY supervisor.conf /usr/src/supervisor.conf
 
 # shairport-sync image entrypoint starts dbus and avahi daemons that we don't need
 ENTRYPOINT []
-CMD ["supervisord","-c","/usr/src/supervisor.conf"]
+CMD ["/bin/sh", "/usr/src/entry.sh"]

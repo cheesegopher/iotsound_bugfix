@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ -n "$SOUND_DISABLE_UPNP" ]]; then
+  echo "UPnP is disabled, exiting..."
+  exit 0
+fi
+
 # --- ENV VARS ---
 # SOUND_DEVICE_NAME: Set the device broadcast name for UPnP
 SOUND_DEVICE_NAME=${SOUND_DEVICE_NAME:-"balenaSound UPnP $(echo "$BALENA_DEVICE_UUID" | cut -c -4)"}

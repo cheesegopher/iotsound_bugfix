@@ -18,11 +18,15 @@ if [[ -z ${SOUND_SPOTIFY_DISABLE_NORMALISATION+x} ]]; then
 fi
 
 # SOUND_SPOTIFY_USERNAME: Login username for Spotify
-# SOUND_SPOTIFY_PASSWORD: Login password for Spotify
-if [[ -n "$SOUND_SPOTIFY_USERNAME" ]] && [[ -n "$SOUND_SPOTIFY_PASSWORD" ]]; then
+# SOUND_SPOTIFY_PASSWORD: No longer supported. Spotify removed password authentication and
+#   librespot >= 0.5 exits on startup if --password is passed, so it is ignored and zeroconf is used.
+#   SOUND_SPOTIFY_USERNAME is still passed so cached credentials from a previous login can be reused.
+if [[ -n "$SOUND_SPOTIFY_USERNAME" ]]; then
   set -- "$@" \
-    --username "$SOUND_SPOTIFY_USERNAME" \
-    --password "$SOUND_SPOTIFY_PASSWORD"
+    --username "$SOUND_SPOTIFY_USERNAME"
+fi
+if [[ -n "$SOUND_SPOTIFY_PASSWORD" ]]; then
+  echo "WARNING: SOUND_SPOTIFY_PASSWORD is ignored. Spotify no longer supports password login, connect from the Spotify app instead (zeroconf)."
 fi
 
 # SOUND_SPOTIFY_ENABLE_CACHE: Enable Spotify audio cache
@@ -35,7 +39,7 @@ fi
 # We use set/$@ because librespot for some reason does not like env vars and quote escapes
 echo "Starting Spotify plugin..."
 echo "Device name: $SOUND_DEVICE_NAME"
-[[ -n "$SOUND_SPOTIFY_USERNAME" ]] && [[ -n "$SOUND_SPOTIFY_PASSWORD" ]] && echo "Using provided credentials for Spotify login."
+[[ -n "$SOUND_SPOTIFY_USERNAME" ]] && echo "Using cached credentials for Spotify user $SOUND_SPOTIFY_USERNAME if available."
 [[ -n ${SOUND_SPOTIFY_DISABLE_NORMALISATION+x} ]] && echo "Volume normalization disabled."
 [[ -n ${SOUND_SPOTIFY_ENABLE_CACHE+x} ]] && echo "Spotify audio cache enabled."
 

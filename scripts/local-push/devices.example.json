@@ -1,0 +1,27 @@
+{
+  "_comment": "Copy this file to devices.json and edit it. 'address' is the Pi's IP or <hostname>.local. 'env' replaces the variables you would set in the balenaCloud dashboard: those are NOT applied to devices in local mode. Variables in 'env' at the top level apply to every device, a device's own 'env' overrides them. Prefix a variable with a service name to scope it, e.g. 'spotify:SOUND_DEVICE_NAME'.",
+  "env": {
+    "SOUND_VOLUME": "75",
+    "AUDIO_OUTPUT": "AUTO"
+  },
+  "devices": [
+    {
+      "name": "living-room",
+      "address": "192.168.0.50",
+      "env": {
+        "SOUND_MODE": "MULTI_ROOM",
+        "SOUND_DEVICE_NAME": "Living Room",
+        "hostname:SET_HOSTNAME": "living-room"
+      }
+    },
+    {
+      "name": "kitchen",
+      "address": "192.168.0.51",
+      "env": {
+        "SOUND_MODE": "MULTI_ROOM_CLIENT",
+        "SOUND_DEVICE_NAME": "Kitchen",
+        "hostname:SET_HOSTNAME": "kitchen"
+      }
+    }
+  ]
+}
