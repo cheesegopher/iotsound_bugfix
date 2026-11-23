@@ -12,6 +12,8 @@ services:
     privileged: true
     labels:
       io.balena.features.dbus: 1
+      # Host kernel modules, so the audio service can enable the Raspberry Pi 3.5mm jack (see core/audio/pre-entry.sh)
+      io.balena.features.kernel-modules: 1
     ports:
       - 4317:4317
 

@@ -1,7 +1,13 @@
 # hadolint ignore=DL3006
 FROM bh.cr/balenalabs/audio-%%BALENA_ARCH%%
 
+# zstd: pre-entry.sh decompresses kernel modules (balenaOS ships them zstd-compressed)
+# hadolint ignore=DL3018
+RUN apk add --no-cache zstd
+
 WORKDIR /usr/src
 COPY . .
 
+# pre-entry.sh fixes up sound hardware, then runs the audio block's entry.sh
+ENTRYPOINT [ "/bin/bash", "/usr/src/pre-entry.sh" ]
 CMD [ "/bin/bash", "/usr/src/start.sh" ]
